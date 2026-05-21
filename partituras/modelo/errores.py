@@ -27,4 +27,12 @@ class EspacioBordes(ErrorPartitura):
     def __init__(self, mensaje):
         super().__init__(mensaje)
 
+class ErrorArchivo(ErrorPartitura):
+    pass
+
+class ArchivoNoEncontrado(ErrorArchivo):
+    pass
+
+class ArchivoCorrupto(ErrorArchivo):
+    pass
 
