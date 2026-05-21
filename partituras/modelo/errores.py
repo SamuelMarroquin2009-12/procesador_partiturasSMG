@@ -7,3 +7,15 @@ class ContieneNumero(ErrorPartitura):
         detalles = ", ".join(f"pos {i}: '{c}'" for i, c in posiciones)
         super().__init__(f"La partitura contiene números en: {detalles}")
 
+class ContieneCaracterInvalido(ErrorPartitura):
+    def __init__(self, posiciones):
+        self.posiciones = posiciones
+        detalles = ", ".join(f"pos {i}: '{c}'" for i, c in posiciones)
+        super().__init__(f"La partitura contiene caracteres inválidos en: {detalles}")
+
+class SinNotas(ErrorPartitura):
+    def __init__(self):
+        super().__init__("La partitura no contiene ninguna nota (solo | y/o -)")
+
+
+
