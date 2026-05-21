@@ -15,3 +15,31 @@ class LectorPartituras:
         except json.JSONDecodeError as e:
             raise ArchivoCorrupto(f"El archivo {self.ruta_archivo} no es un JSON válido: {e}") from e
         return datos["partituras"]
+    def procesar_con(self, compositor: Compositor) -> list[dict]:
+        partituras = self.cargar()
+        resultados = []
+        for original in partituras:
+            transformada = None
+            revertida = None
+            exito = True
+            errores = []
+            try:
+                transformada = compositor.transformar(original)
+                revertida = compositor.revertir(transformada)
+            except ExceptionGroup as eg:
+                exito = False
+                errores = [str(err) for err in eg.exceptions]
+            except ErrorPartitura as e:
+                exito = False
+                errores.append(str(e))
+            except Exception as e:
+                exito = False
+                errores.append(str(e))
+            resultados.append({
+                "original": original,
+                "transformada": transformada,
+                "revertida": revertida,
+                "exito": exito,
+                "errores": errores
+            })
+        return resultados
