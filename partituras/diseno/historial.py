@@ -39,3 +39,12 @@ class RegistroHistorial:
                 self.entradas = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             self.entradas = []
+"""
+Justificación de diseño para RegistroHistorial:
+- Cada entrada guarda timestamp, nombre de regla, token, partitura original, resultado y posible error.
+- Permite persistencia en JSON para conservar el historial entre ejecuciones.
+- Incluye un método que responde una pregunta no trivial mediante comprehensions y Counter:
+  'top_reglas_con_mas_errores' que devuelve las n reglas con más fallos.
+- La lista de entradas se mantiene en memoria y se sincroniza con el archivo al registrar o al cargar.
+- El manejo de errores de archivo es silencioso (reinicia la lista) por simplicidad, pero se podría extender.
+"""

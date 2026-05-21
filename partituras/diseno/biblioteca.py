@@ -34,3 +34,13 @@ class BibliotecaPartituras:
             raise ArchivoNoEncontrado(f"No se encontró {self.archivo}")
         except json.JSONDecodeError:
             raise ArchivoCorrupto(f"Archivo corrupto: {self.archivo}")
+
+"""
+Justificación de diseño para BibliotecaPartituras:
+- Almacena partituras en un diccionario {nombre: contenido} para búsqueda rápida.
+- Permite persistencia opcional mediante archivo JSON (guardar/cargar).
+- Maneja errores de archivo usando las excepciones ya definidas (ArchivoNoEncontrado, ArchivoCorrupto).
+- Ofrece operaciones con comprehensions: buscar por nombre, por contenido, filtrar por cantidad de notas.
+- El método __init__ acepta ruta opcional; si se proporciona, carga automáticamente.
+- Tras agregar una partitura, si hay archivo definido, se guarda automáticamente (persistencia inmediata).
+"""

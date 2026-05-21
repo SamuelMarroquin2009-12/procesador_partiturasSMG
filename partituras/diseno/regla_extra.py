@@ -21,3 +21,12 @@ class ReglaRetrogradacion(ReglaTransformacion):
 
     def revertir(self, partitura: str) -> str:
         return self.transformar(partitura)
+
+    """
+    Justificación de diseño para ReglaRetrogradacion:
+    - Hereda de ReglaTransformacion para aprovechar el contrato establecido (métodos abstractos).
+    - La transformación elegida es la retrogradación (inversión del orden de las notas).
+    - Es simétrica: transformar y revertir hacen lo mismo, por lo que revertir llama directamente a transformar.
+    - La validación es simple: solo se permiten notas (sin | ni -), y debe haber al menos una nota.
+    - Se reutilizan las excepciones ya definidas (SinNotas, ContieneCaracterInvalido).
+    """
