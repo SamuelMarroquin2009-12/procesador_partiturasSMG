@@ -79,3 +79,53 @@ class ReglaTransposicion(ReglaTransformacion):
         partitura_min = partitura.lower()
         self.partitura_valida(partitura_min)
         return self._aplicar_transposicion(partitura_min, -self.token)
+
+class ReglaFrecuencia(ReglaTransformacion):
+    def partitura_valida(self, partitura: str) -> bool:
+        errores = []
+        nums = self.encontrar_numeros_partitura(partitura)
+        if nums:
+            errores.append(ContieneNumero(nums))
+        inv = self.encontrar_caracteres_invalidos(partitura)
+        if inv:
+            errores.append(ContieneCaracterInvalido(inv))
+
+        if partitura != partitura.strip():
+            errores.append(EspacioBordes("La partitura tiene espacios al inicio o al final"))
+        if "  " in partitura:
+            posiciones = [i for i in range(len(partitura)-1) if partitura[i] == " " and partitura[i+1] == " "]
+            errores.append(EspacioMultiple(posiciones))
+
+        tokens = partitura.lower().split()
+        for tok in tokens:
+            if tok not in NOTAS:
+                pos = partitura.find(tok)
+                if pos != -1:
+                    errores.append(ContieneCaracterInvalido([(pos, tok)]))
+        if not tokens:
+            errores.append(SinNotas())
+
+        if errores:
+            if len(errores) == 1:
+                raise errores[0]
+            else:
+                raise ExceptionGroup("Múltiples errores en la partitura", errores)
+        return True
+
+    def transformar(self, partitura: str) -> str:
+        partitura_min = partitura.lower()
+        self.partitura_valida(partitura_min)
+        tokens = partitura_min.split()
+        frecuencias = [str(FRECUENCIAS[tok] * self.token) for tok in tokens]
+        return " ".join(frecuencias)
+
+    def revertir(self, partitura: str) -> str:
+        valores = partitura.split()
+        notas = []
+        for val in valores:
+            freq = float(val) / self.token
+            for nota, fbase in FRECUENCIAS.items():
+                if abs(freq - fbase) < 0.5:
+                    notas.append(nota)
+                    break
+        return " ".join(notas)
