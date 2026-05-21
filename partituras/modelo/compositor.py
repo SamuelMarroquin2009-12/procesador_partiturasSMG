@@ -28,3 +28,54 @@ class ReglaTransformacion(ABC):
 
     def encontrar_caracteres_invalidos(self, partitura: str):
         return [(i, c) for i, c in enumerate(partitura) if ord(c) > 127]
+
+class ReglaTransposicion(ReglaTransformacion):
+    def partitura_valida(self, partitura: str) -> bool:
+        errores = []
+        nums = self.encontrar_numeros_partitura(partitura)
+        if nums:
+            errores.append(ContieneNumero(nums))
+        invalidos = self.encontrar_caracteres_invalidos(partitura)
+        if invalidos:
+            errores.append(ContieneCaracterInvalido(invalidos))
+
+        tokens = partitura.lower().split()
+        tiene_nota = any(tok in NOTAS for tok in tokens)
+        permitidos = set(NOTAS + ["|", "-"])
+        for tok in tokens:
+            if tok not in permitidos:
+                if not any(c.isdigit() for c in tok) and all(ord(c) <= 127 for c in tok):
+                    pos = partitura.find(tok)
+                    if pos != -1:
+                        errores.append(ContieneCaracterInvalido([(pos, tok)]))
+        if not tiene_nota:
+            errores.append(SinNotas())
+
+        if errores:
+            if len(errores) == 1:
+                raise errores[0]
+            else:
+                raise ExceptionGroup("Múltiples errores en la partitura", errores)
+        return True
+
+    def _aplicar_transposicion(self, partitura: str, avance: int) -> str:
+        tokens = partitura.split()
+        resultado = []
+        for tok in tokens:
+            if tok in NOTAS:
+                idx = NOTAS.index(tok)
+                nueva_idx = (idx + avance) % len(NOTAS)
+                resultado.append(NOTAS[nueva_idx])
+            else:
+                resultado.append(tok)
+        return " ".join(resultado)
+
+    def transformar(self, partitura: str) -> str:
+        partitura_min = partitura.lower()
+        self.partitura_valida(partitura_min)
+        return self._aplicar_transposicion(partitura_min, self.token)
+
+    def revertir(self, partitura: str) -> str:
+        partitura_min = partitura.lower()
+        self.partitura_valida(partitura_min)
+        return self._aplicar_transposicion(partitura_min, -self.token)
